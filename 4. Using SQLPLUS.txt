@@ -1,0 +1,87 @@
+Using SQL*Plus
+
+1. Komanda sqlplus
+
+nece da udje znaci dam ora da se setuje okruzenje
+
+2. Komanda za setovanje okruzenja:
+
+$ export ORACLE_HOME= /u01/app/oracle/product/11.1.0/db_1
+
+3. Komanda za setovanje ORACLE_SID:
+
+$ ORACLE_SID=orcl
+
+$ export ORACLE_SID
+
+4. Konekcija na bazu za korisnika:
+
+$ sqlplus hr/hr
+
+5. Konekcija na bazu kao SYSDBA administrator:
+
+$ sqlplus sys/sifra AS SYSDBA
+
+//moze ovako - kroz operativni sistem drugacije ne bi moglo
+
+$ sqlplus / as sysdba
+
+//moze ovako - kroz operativni sistem takodje
+
+$ sqplus sys/sys as sysdba
+
+6. Kada smo vec konektovani na bazu a zelimo da se konektujemo kao drugi korisnik koristimo:
+
+CONNECT hr/hr
+
+//moze i ovako ako zelimo kao administrator
+
+CONNECT sys/sifra as SYSDBA
+
+7. Komanda za konektovanje kao /nolog i sluzi samo za pisanje komandi i editovanje skriptova:
+
+$ sqlplus /nolog
+
+8. Komanda koja pokazuje sta se sve nalazi u RECYCLEBIN:
+
+SHOW RECYCLEBIN;
+
+9. Komanda koja pokazuje koji je trentni ulogovani korisnik:
+
+SHOW USER;
+
+10. Komanda za prikaz SGA memorije:
+
+SHOW SGA;
+
+11. Komanda pomocu kojom se opisuje osobina tabele(imena kolona, data tip, null ili not null vrednost):
+
+DESCRIBE employees;
+
+12. Komanda za pravljenje txt fajla od rezultata upita - SPOOL:
+
+SPOOL employee.lst
+SELECT emp_id, last_name, salary, manager FROM employee;
+SPOOL OFF;
+
+// ili bolje ovako
+
+SPOOL /u01/app/oracle/data/employees.txt;
+SELECT * FROM hr.employees;
+SPOOL OFF;
+
+13. Komanda za pokretanje za izvrsavanje paketa ili procedura:
+
+EXECUTE add_data
+
+14. Komanda za arhiviranje redo log fajlova i kljucna je za database recovery:
+
+ARCHIVE LOG START
+
+//statement processed.
+
+ARCHIVE LOG STOP
+
+15. Komanda za detalje i arhiviranim redo logs fajlovima:
+
+ARCHIVE LOG LIST
