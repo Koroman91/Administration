@@ -1,0 +1,46 @@
+Loading and Transforming Data
+
+DBA obicno koriste loadovanje podataka iz eksternih zvora. DBA koriste SQL*Loader mogucnosti
+da loaduju podatke iz flat fajla u Oracle tabele baze podataka.
+
+1. Komanda za formiranje txt fajla:
+
+set heading off 
+set pagesize 0
+
+2. Komanda za pripremu txt fajla:
+spool C:\whatever.txt
+SELECT object_name||','||object_type FROM all_objects
+spool off
+
+3. Komanda za kreiranje nove tabele na osnovu elemenata neke tabele:
+
+CREATE TABLE loaded as 
+SELECT object_name, object_type FROM all_objects
+WHERE 1=0;
+
+//1.korak napraviti whatever.ctl fajl u notpedu i staviti ga na lokaciju pored
+whatever.txt u C:\app\ i u njemu upisati sledeci txt
+
+LOAD DATA
+     INFILE 'C:\app\whatever.txt'
+     DISCARDFILE 'C:\whatever.dis'
+INTO TABLE loaded TRUNCATE
+WHEN OBJECT_TYPE <> 'INDEX'
+FIELDS TERMINATED BY ","
+(
+   OBJECT_NAME,
+   OBJECT_TYPE "TRIM (:object_type)"
+)
+
+//2.korak u obicnom cmdu ukucati sledecu komandu za logove:
+
+sqlldr control=C:\app\whatever.ctl log=C:\app\whatever.log
+
+//3.korak whatever.log ce prikazati na kraju TABLE LOADED da je uspesno loaadovano
+
+4. Komanda za loadovanje excel csv fajla u tabelu baze podataka Oracle:
+
+sqlldr sys
+control = C:\app\testcontrol.ctl
+//sifra

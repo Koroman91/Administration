@@ -1,0 +1,92 @@
+Data Pump Utility
+
+1. DATA_PUMP_DIR - directory object
+
+nalazi se u ORACLE_BASE/admin/SID
+nalazi se u ORACLE_HOME/admin/SID
+
+2.Upit za lociranje DATA_PUMP_DIR (lociranje pomocu view DBA_DIRECTORIES)
+
+SELECT * FROM DBA_DIRECTORIES;
+
+3. Eksportovanje se moze vrsiti kao SYS I SYSTEM bez navodjenja imena object directory:
+
+expdp system/sifra
+
+4. Pravljenje direktorijuma za korisnika da bi izvrsio data pump:
+
+CREATE DIRECTORY dpump_dir1 AS '/u01/finance/oradata/dump_dir';
+
+5. Davanje privilegija korisniku da moze da cita i pise, menja taj direktorijum za data pump
+
+GRANT READ, WRITE ON DIRECTORY dpump_dir1 TO korisnik_ime
+
+
+6. Vrsenje eporta preko Data Pump sa DIRECTORY parametrom koji ukazuje na ime objekta direktorijuma:
+
+$ expdp salapati/password DIRECTORY=dpump_dir1 dumpfile=testexp01.dmp
+
+7. Kao sto znate nemoguce je dodeliti apsolutni path direktorijuma za Data Pump poslove. Morate uvek koristiti directory object. Tako da morate specificirati ime objkta direktorijuma I to se radi na nekoliko nacina:
+-	DIRECTORY parameter a to se radi na sledeci nacin:
+
+$ expdp hr/hr DIRECTORY=dpump_dir1…
+
+-	DIRECTORY:FILE notacija – pored koriscenjea DIRECTORY parametra, potrebno je da specificirate ime objekta direktorijuma kao deo vrednosti specificnog Data Pump fajla (dump file, log file, SQL file). Koristi se ( : ) da odvoji direktorijum sa individulanim filename  u specifikaciji fajla. Na sledecem primeru  dpump_dir2 je ime objekta direktorijuma I Data Pump filename je salapati.log na sledeci nacin:
+
+$ expdp LOGFILE=dpump_dir2:salapati.log
+-	DATA_PUMP_DIR varijabla okruzenja: moguce je takodje koristiti ovu varijablu  kao tacku objekta direktorijuma na server. To se radi u nekoliko koraka:
+
+SQL> CREATE DIRECTORY data_dump_dir2 AS ‘/u01/app/oracle/datapump/dumpfiles_02’;
+
+$export DATA_PUMP_DIR data_dump_dir2
+
+$expdp salapati/password TABLES=employees DUMPFILES=employees.dmp
+
+8. Eksportovanje preko komandne linije
+
+$ expdp system/manager DIRECTORY=dpump_dir1 DUMPFILE=expdat1.dmp
+
+9. Eksportovanje preko parametra
+
+SCHEMAS=HR
+DIRECTORY=dump_dir1
+DUMPFILE=system1.dmp
+SCHEMAS=hr
+$expdp PARFILE=myfile.txt
+
+10. Eksportovanje druge seme preko SCHEMAS parametra kada smo ulogovani kao SYSTEM:
+
+$ expdp system/sifra DUMPFILE=scott.dmp SCHEMAS=SCOTT
+
+11. Eksportovanje preko SYSTEM uz parametar CONTENT - sadrzaj koji ce biti eksportovan:
+
+CONTENT
+Koriscenjem CONTENT parametrom mozete da filtrirate sta ce ici u export dump file. CONTENT parameter moze da ima tri vrednosti:
+-	ALL eksportuje sve tabele objekata I tabele  i druge objekte i definicije  (metadata)
+-	DATA_ONLY eksportuje samo redove tabela
+-	METADATA_ONLY eksportuje samo metadata – podaci o podacima
+Evo primera:
+
+$ expdp system/sifra DUMPFILE=expdat1.dmp CONTENT=DATA_ONLY
+
+12. Importovanje zajedno sa parametrom SQLFILE koji eksportuje DDL iskaze iz eksportovanog
+dump fajla u neki drugi direktorijum sa .sql ekstenzijom
+
+$ impdp system/sifra DIRECTORY=dpump_dir1 DUMPFILE=scott.dmp SQLFILE=dpump_dir2:finance.sql SCHEMAS=scott
+
+13. Komanda za rempairanje tabele - promene naziva tabele tokom importa
+
+$ impdp hr/HR DIRECTORY=dpump_dir1 DUMPFILE=newdpump.dmp – TABLES=hr.employees REMAP_TABLE=hr.employees:emp
+
+14. Komanda za remparianje scheme - prebaciavanje objekata iz jedne seme u drugu prilikom importa
+
+$ impdp system/sifra DUMPFILE=newdump.dmp REMAP_SCHEMA=hr.oe
+
+15. Komanda za remapiranje datafile iz Windows OS u Linux OS
+
+$ impdp hr/hr FULL=Y DIRECTORY=dpump_dir1 DUMPFILE=db_full.dmp \ REMAP_DATAFILE=’DB1$:[HRDATA.PAYROLL]tbs6.f’:’/db1/hrdata/payroll/tbs6.f’
+
+16. Komanda za remapiranje tablespacea - prenos objekata iz jednog tablespacea u drugi tablespace tokom importa
+
+$ impdp hr/hr REMAP_TABLESPACE='example_tbs':'new_tbs' DIRECTORY=dpump_dir1 \
+PARALLEL=2 JOB_NAME=TESTJOB_01 DUMPFILE=employees.dmp NOLOGFILE=Y

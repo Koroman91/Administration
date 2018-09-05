@@ -1,0 +1,149 @@
+Managing Tablespaces
+
+1. Komanda za pravljenje tablespace:
+
+za tablespace: CREATE TABLESPACE
+za temporary tablespace: CREATE TEMPORARY TABLESPACE
+za undo tablespace: CREATE UNDO TABLESPACE
+
+2. Komanda za pravljenje tablespace sa datafile i odredjenom velicinom size
+
+CREATE TABLESPACE test01
+DATAFILE '/pasx02/oradata/pasx/test01.dbf'
+SIZE 500M;
+
+3. Komanda za pravljenje tablespace sa dodatnim mogucnostima:
+
+CREATE TABLESPACE test02
+DATAFILE '/pasx02/oradata/pasx/test02.dbf' size 500M
+EXTENT MANAGEMENT local
+AUTOALLOCATE 500M
+SEGMENT SPACE MANAGEMENT AUTO;
+
+4. Komanda za dealociranje segmenata tabele:
+
+ALTER TABLE ime_tabele DEALLOCATE UNUSED;
+
+5. Komanda za pravljenje tablespacea sa UNFIFORMNIM EXTENTOM SA UNIFORM SIZE:
+
+CREATE TABLESPACE test01
+DATAFILE '/pasx02/oradata/pasx/test01_01.dbf' SIZE 100M
+UNIFORM SIZE 5M;
+
+6. Komanda za dodavanje prostora u tablespace:
+
+ALTER TABLESPACE test01
+ADD DATAFILE '/finance10/app/oracle/finance/test01.dbf'
+SIZE 1000M;
+
+7. Komanda za promenu velicine datog datafilea:
+
+ALTER DATABASE DATAFILE '/finance10/oradata/data_09.dbf'
+RESIZE 500M;
+
+8. Komanda za dodavanje datafile u tablespace sa jos opcija:
+
+ALTER TABLESPACE data01 
+ADD DATAFILE '/finance10/oradata/data01.dbf' SIZE 200M
+AUTOEXTEND ON   //autoextend parametar
+NEXT 10M    //kada je prostor potreban on ce dodati 10mb extenta
+MAXSIZE 1000M;
+
+9. Komanda za uklanjanje tablespacea
+
+DROP TABLESPACE test01;
+
+// javice gresku ako se na njoj nalaze tabele ili objekti pa ce komanda za uklanjanje biti:
+
+DROP TABLESPACE test01 INCLUDING CONTENTS;
+
+10. Komanda za uklaanjanje tablespace zajedno sa objektima tabelaama i indeksima uklucujuci i datafileove:
+
+DROP TABLESPACE test01 INLCUDING CONTENTS AND DATAFILES;
+
+11. Komanda za uklajanje tablesapce sa ogranicenjima:
+
+DROP TABLESPACE test01 CASCADE CONSTRAINTS;
+
+12. Komanda za stavljanje tablespace u OFFLINE mod dok se vrsi recovery ili slicno:
+
+ALTER TABLESPACE users OFFLINE IMMEDIATE;
+
+13. Komanda za vracanje tablesapce u ONLINE mod:
+
+ALTER TABLESPACE ime tablespace ONLINE;
+
+14. Komanda za promenu imena tablespacea:
+
+ALTER TABLESPACE test01 RENAME TO test02;
+
+15. Komanda za proces promene imena datafajlova:
+
+prvi korak: staviti tablespace u offline normalni mod
+
+ALTER TABLESPACE test01 OFFLINE NORMAL;
+
+drugi korak: koristiti unix komandu za kopiranje datafile sa jedne na drugu lokaciju
+
+$ cp /u01/app/oracle/test01.dbf   /u02/app/oracle/test01.dbf
+
+treci korak: promena datafile imena unutar tablespacea:
+
+ALTER TABLESPACE tes01
+RENAME DATAFILE
+'/u01/app/oracle/test01.dbf'
+TO
+'/uo2/app/oracle/test01.dbf'
+
+16. Komanda da omoguci da se tablespace samo cita
+
+ALTER TABLESPACE test01 READ ONLY;
+
+17. Komanda da u tablespace moze citati i pisati:
+
+ALTER TABLESPACE test01 READ WRITE;
+
+18. Komanda za pravljenje Temporary tablespace:
+
+CREATE TEMPORARY TABLESPACE temp_demo
+TEMPFILE 'temp01.dbf size 500M
+AUTOEXTEND ON;
+
+19. Komanda za promenu velicine temporary tablespace:
+
+ALTER TABLESPACE temp
+ADD TEMPFILE '/u01/app/oracle/tempfile/temp03.dbf' size 1000M reuse;
+
+20. Komanda koja radi promenu velicine samog tempfile;
+
+ALTER DATABASE TEMPFILE '/u01/app/oracle/tempfile/temp03.dbf'
+RESIZE 200M;
+
+21. Komanda za uklanjanje OS file i tempfile:
+
+ALTER DATABASE TEMPFILE '/u01/app/oracle/tempfile/temp03.dbf'
+DROP INCLUDING DATAFILES;
+
+22. Komanda za pregleda imena i prostora tablespacea:
+
+SELECT tablespace_name, SUM(BYTES) FROM DBA_FREE_SPACE GROUP BY tablespace_name;
+
+23. Komanda za pregled data file i njihovih imena tablespaceova:
+
+SELECT file_name, tablespace_name FROM DBA_DATA_FILES;
+
+24. Komanda koja proverava ko je od kojih datafile i tablespace
+
+SELECT t.name, d.name, d.bytes
+FROM v$tablespace t
+JOIN v$tablespace d
+ON t.ts# = d.ts#
+ORDER BY  t.name;
+
+
+
+
+
+
+
+

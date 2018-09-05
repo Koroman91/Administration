@@ -1,0 +1,54 @@
+Oracle Transaction Management
+
+1. Komanda kojom se potvrdjuje sql iskaz i zvanicno se zapisuje u datafiles disk ili .dbf
+
+COMMIT;
+
+2. Komanda kojom se sve promene vracaju na pocetak u transakciji
+
+ROLLBACK;
+
+3. Komanda kojom se vracaju sve promene na tacku koju zelimo
+
+ROLLBACK TO SAVEPOINT POINT A;
+
+4. Komanda kojom se postavlja da se nakon svakog SQL upita auto - commit-uje:
+
+SET AUTOCOMMIT ON;
+
+5. Komanda kojom se sve promene SQL upita nece sacuvati tako sto se ukuca komanda za izlaz:
+
+EXIT;
+
+6. Komanda za pocetak stransakcije:
+
+SET TRANSACTION NAME 'ime';
+
+// sql upit1
+// sql upit2
+// sql upit3
+
+COMMIT;
+
+Kod ovog slucaja potrebno je da su sva tri upita tacna 100% da bi moglo da se izvrsi commit,
+ako nesto ne radi od toga onda ce se sve rollback - vratiti.
+
+// ORACLE SCN - broj promene nekog podatka, svaki checkpoint menja taj broj. 
+
+7. Komanda za pravljenje tacke suvanja promene:
+
+savepoint one;
+
+// sql kod
+
+savepoint two;
+
+// sql kod
+
+savepoint three;
+
+// sql kod
+
+//Komanda za vracanje na odredjenu tacku u skriptu:
+
+rollback one;

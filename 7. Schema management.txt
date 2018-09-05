@@ -1,0 +1,194 @@
+Schema management
+
+1. Komanda za pravljenje tabele
+
+CREATE TABLE emp (
+
+empno NUMBER(5) PRIMARY KEY,
+ename VARCHAR2(15) NOT NULL,
+ssn NUMBER(9),
+job VARCHAR2(10),
+mgr NUMBER(5),
+deptno NUMBER(3) NOT NULL);
+
+2. Komanda za dodavanje nove kolone u tabelu:
+
+ALTER TABLE emp (
+ADD (retired char(1));
+
+3. Komanda za uklanjanje kolone iz tabele:
+
+ALTER TABLE emp
+DROP (retired);
+
+4. Komanda za menjanje imena kolone
+
+ALTER TABLE emp RENAME COLUMN retired TO non_active;
+
+5. Komanda za menjanje imena tabele
+
+ALTER TABLE emp RENAME TO emp;
+
+6. Komanda za brisanje svih elemenata iz tabele 
+
+TRUNCATE TABLE test;
+
+7. Komanda za pravljenje nove tabele pomocu SELECT * FROM
+
+CREATE TABLE emp_new
+AS
+SELECT * FROM emp;
+
+8. Komanda za pomeranje tabele iz jednog tablespacea u drugi tablespace
+
+ALTER TABLE employee MOVE new_tablespace;
+
+9. Komanda za stavljanje tabele u READ ONLY mod
+
+ALTER TABLE test READ ONLY;
+
+10. Komanda za stavljanje tabele u READ WRITE mod
+
+ALTER TABLE test READ WRITE;
+
+11. Komanda za scenario: ako smo slucajno izbrisali tabelu, mozemo da je vratimo:
+
+FLASHBACK TABLE emp TO BEFORE DROP;
+
+12. Komanda za permanentno brisanje tabele:
+
+DROP TABLE emp PURGE;
+
+13. Komanda za brisanje tabele zajedno sa ogranicenjma kao sto su: primary, unique key, foreign key i drugo
+
+DROP TABLE emp CASCADE CONSTRAINTS;
+
+14. Komanda za pregled DBA_TABLES iz data dictionary view za nekog vlasnika
+
+SELECT tablespace_name, table_name, num_rows FROM dba_tables
+WHERE owner='HR';
+
+15. Komanda za pregled DBA_TAB_COLUMNS iz data dictionary view, pregled tipa kolona
+
+SELECT column_name, data_type, nullable FROM dba_tab_columns
+WHERE owner='HR' AND table_name ='EMPLOYEES';
+
+16. Komanda za opis tabele
+
+DESCRIBE new_employees;
+
+17. Komanda za pravljenje tabele sa primarnim kljucem
+
+CREATE TABLE dept (dept_id NUMBER(9) PRIMARY KEY);
+
+18. Komanda za dodavanje ogranicenja u vec postojecu tabelu
+
+ALTER TABLE dept ADD PRIMARY KEY(dept_id);
+
+19. Komanda koja dodaje ogranicenje primarni kljuc na vec postojecu tabelu i daje ime primanog kljuca
+
+ALTER TABLE dept ADD CONSTRAINT dept_pk PRIMARY KEY(dept_id);
+
+20. Komanda za dodavanje kolone sa NOT NULL vrednostima
+
+CREATE TABLE employee (last_name VARCHAR(30) NOT NULL);
+
+21. Komanda za modifikovanje kolone da bude NOT NULL:
+
+ALTER TABLE employee MODIFY last_name NOT NULL;
+
+22. Komanda koja postavlja ogranicenje za neku kolonu prilikom kreacije tabele:
+
+CREATE TABLE employee (salary NUMBER CHECK(salary <100000));
+
+23. Komanda koja postavlja ogranicenje UNIQUE koja obezbedjuje jedinstvene vrednosti u koloni 
+
+CREATE TABLE dept (
+dept_no NUMBER(3),
+dept_name VARCHAR2(15),
+CONSTRAINT dept_name_ukey UNIQUE(dept_Name));
+
+24. Komanda za DODAVANJE ogranicenja u tabeli
+
+ALERT TABLE dept ADD CONSTRAINT dept_idx UNIQUE(dept_no);
+
+25. Komanda za pravljenje VIEW na osnovu select iskaza
+
+CREATE VIEW my_employees AS
+SELECT employee_id, first_name, last_name, salary FROM employees WHERE manager_id=122;
+
+26. Komanda za selektiranje podataka iz VIEW
+
+SELECT * FROM my_employees;
+
+27. Komanda za pregled tabele sa Synonymom
+
+DESC employees;
+//javlja gresku
+DESC hr.employees;
+//objavice ceo opis tabele jer smo naveli sinonim hr
+
+28. Komanda za pravljenje javnog Synonyma
+
+CREATE PUBLIC SYNONYM employees FOR hr.employees;
+
+29. Komanda za pravljenje privatnog Synonyma
+
+CREATE SYNONYM addresses FOR hr.locations;
+
+30. Komanda za brisanje Synonyma
+
+DROP SYNONYM addresses;
+
+31. Komanda za pregled Synonyma iz dba_synonyms
+
+SELECT TABLE_NAME, SYNONYM_NAME
+FROM dba_synonyms
+WHERE OWNER='SALAPATI';
+
+32. Komanda za pravljanje sekvence koja moze da se koristi za nabrojavanje automatsko
+
+CREATE SEQUENCE employee_seq
+START WITH 10000
+INCREMENT BY 1
+NOMAXVALUE
+NOCYCLE;
+
+32. Komanda za dodavanje vrednosti sa brojem iz sequence - employee_seq
+
+INSERT INTO employee(employee_id, first_name, last_name)
+VALUES (employee_seq.nextval, 'sam', 'alapati');
+COMMIT; - za potvrdu
+
+33. Komanda za proveru vrednosti sequence koju smo dodali i koja je po defaultu pocela od 10000
+
+SELECT employee_id, first_name, last_name
+FROM employees
+WHERE last_name = 'alapati';
+// resenje ce biti: 10001 sam alapati
+
+34. Komanda za pregled odredjenog objekta iz DBA_OBJECTS
+
+SELECT object_name, object_type, created, last_ddl_time, FROM DBA_OBJECTS
+WHERE owner='APPOWNER'
+AND object_name LIKE 'YTD%';
+
+35. Komanda za pregled tabela iz DBA_TABLES
+
+SELECT tablespace_name, table_name FROM DBA_TABLES;
+
+36. Komanda za pregled osobina tabele iz DBA_TAB_COLUMNS
+
+SELECT column_name, data_type, nullable, FROM dba_tab_columns WHERE owner='OE';
+
+
+
+
+
+
+
+
+
+
+
+

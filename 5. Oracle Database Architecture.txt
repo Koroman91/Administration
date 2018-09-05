@@ -1,0 +1,14 @@
+Oracle Database Architecture
+
+1. Komanda za pregled svih controlfileova:
+
+SELECT status, name, is_recovery_dest_file FROM v$CONTROLFILE;
+
+2. Komanda za pregled celog data dictionary:
+
+SELECT * FROM dict;
+
+3. Komanda za pravljenje nove tabele pomocu stare strukture:
+
+CREATE TABLE LOADED AS SELECT object_name, object_type from all_objects
+WHERE 1=0;

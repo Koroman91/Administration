@@ -1,0 +1,220 @@
+Pravljenje Default tablespacea, temporary tablespace, korisnika i dodela privlegija
+
+1. Napraviti tablespace 
+
+CREATE TABLESPACE johny_tabspace
+datafile 'johny_tabspace.dat'
+size 10M autoextend ON;
+
+2. Napraviti temporary tablespace
+
+CREATE TEMPORARY TABLESPACE johny_tabspace_temp
+tempfile 'johny_tabspace_temp.dat'
+size 5M autoextend ON;
+
+* menjanje velicine datafile za tablespace
+
+ALTER TABLESPACE /IME/ 
+ADD DATAFILE '/lokacija datafailea/'
+SIZE /velicinaM
+AUTOEXTEND ON;
+
+* menjanje velicine datafilea
+
+ALTER DATABASE DATAFILE
+'/lokacija datafilea.dbf'
+RESIZE /velicinaM;
+
+3. Napraviti korisnika
+
+CREATE USER johny
+identified by 1234
+default tablespace johny_tabspace
+temporary tablespace johny_tabspace_temp;
+
+4. Davanje privilegije da korisnik moze da se uloguje na bazu
+
+GRANT CREATE SESSION TO JOHNY;
+
+5. Eksplicitno davanje specificnog tablespace quota:
+
+ALTER USER JOHNY QUOTA 100M ON USERS;
+
+*Jednom kada je novom korisniku dat prostor quota u tablespace, korisnik moze da pravi
+objekte baze podataka kao sto su tabele i indeksi. Po default bilo koji objekti koje 
+korisnik napravi ce biti smesteni u korisnicki default permamentni tablespace, dok god
+korisnik ima prostora quota na tablespace. U slucaju da zelite da korisnik ima neogranicen
+prostor za prava u tablespace onda se da privilegija korisniku UNLIMITED TABLESPACE TO
+
+GRANT UNLIMITED TABLESPACE TO JOHNY;
+
+*Ako zelimo da dozvolimo korisniku da napravi svoj tablespace, to se radi uz pomoc komande:
+
+GRANT CREATE TRABLESPACE TO JOHNY;
+
+6. Mozete praviti novog korisnika i oznaciti ga na temporary tablespace i default tablespace
+sa quotom na 500m(kao primer)
+
+CREATE USER Mark IDENTIFIED BY 1234
+TEMPORRY TABLESPACE TEMPTBS01
+DEFAULT TABLESPACE USERS
+QUOTA 500M ON USERS;
+
+7. Komanda koja pokazuje koji je korisnik
+
+SHOW USER;
+
+8. Komanda kojom se menja sifra korisniku
+
+ALTER USER JOHNY IDENTIFIED BY 1234;
+
+9. Korisnik moze sam da promeni svoju sifru preko komande:
+
+PASSWORD
+
+//stara password
+//nova password
+//ponoviti novu password
+
+10. Komanda za brisanje korisnika i stavlja ga u recycle bin
+
+DROP USER JOHNY;
+
+//korisnika ce obrisati ali ce ostati njegovi objekti
+
+11. Komanda za brisanje korisnika sa objektima tako da ih ne smesta u recycle bin
+
+DROP USER JOHNY CASCADE;
+
+12. Ukinuti pristup korisniku da se konektuje na bazu
+
+REVOKE CREATE SESSION FROM JOHNY;
+
+13. Pravljenje profila - spisak osobina i limita prema kojim korisnik treba da se pridrava
+
+CREATE PROFILE miser
+LIMIT
+connect_time 120
+failed_login_attempts 3
+idle_time 60
+session_per_user 2;
+
+14. Komanda za proveru da li je profil korisnika default
+
+SELECT profile FROM dba_users WHERE username = 'JOHNY';
+
+15. Profil se moze dodeliti i tokom pravljenja korisnika uz sve ono sto smo pravili
+(tablespace default i temporary, datafile, quota, size), komanda za dodavanje profila korisniku
+
+ALTER USER JOHNY PROFILE test;
+
+16. Komanda za proveru liste limita koju obuhvata default profil:
+
+SELECT DISTINCT resource_name, limit FROM dba_profiles WHERE profile='DEFAULT';
+
+17. Komanda za vrsenje izmena nad profilom:
+
+ALTER PROFILE test 
+LIMIT 
+sessions_per_user 4
+failed_login_attempts 4;
+
+18. Komanda za brisanje profila i iz recycle bin:
+
+DROP PROFILE test CASCADE;
+
+//Lista sistemskih privilegija
+
+ADVISOR
+ALTER DATABASE
+ALTER SYSTEM
+AUDIT SYSTEM
+CREATE DATABASE LINK
+CREATE TABLE
+CREATE ANY INDEX
+CREATE SESSION
+CREATE TABLESPACE
+CREATE USER
+DROP USER
+INSERT ANY TABLE
+
+19. ALL PRIVILEGES nisu systemske privilegije, ako zelimo da damo sve privilegije korisniku
+komanda je:
+
+GRANT ALL PRIVILEGES TO JOHNY;
+
+isto tako oduzimanje je
+
+REVOKE ALL PRIVILEGES TO JOHNY;
+
+20. Komanda koja dozvoljava svim korisnicima da se konektuju na bazu dajuci ima privilegiju:
+
+GRANT CREATE SESSION TO public;
+
+21. Komanda - Oduzimanje neke sistemske privilegije od korisnika:
+
+REVOKE DELETE ANY TABLE FROM johny;
+
+//Lista SYSDBA privilegija
+
+izvodi STARUP I SHUTDOWN bazu podataka
+koristi ALTER DATABASE
+koristi CREATE DATABASE
+izvodi ARCHIVELOG i RECOVERY 
+pravi SPFILE
+
+//Lista SYSOPER privilegija
+
+izvodi STARUP I SHUTDOWN bazu podataka
+koristi ALTER DATABASE
+izvodi ARCHIVELOG i RECOVERY 
+pravi SPFILE
+
+//Lista privilegija nad objektima
+ALTER
+SELECT
+DELETE
+EXECUTE
+INSERT
+REFERENCES
+INDEX
+
+-PRIVILEGIJE ZA TABELE:SELECT,ALTER,DELETE,INSERT,UPDATE
+
+primer: GRANT INSERT (SALARY) ON persons TO johny;
+
+-PRIVILEGIJE ZA VIEW:SELECT,DELETE,INSERT,UPDATE
+
+primer: GRANT SELECT,UPDATE ON emp_view TO PUBLIC;
+
+-PRIVILEGIJE ZA SEKVENCU: ALTER,SELECT
+
+GRANT SELECT ON oe.customers_seq TO hr;
+
+-PRIVILEGIJE ZA PROCEDUERE, FUNKCIJE I PROCEDURE: EXECUTE i DEBUG
+
+-PRIVILEGIJE ZA MATERIJALIZOVANE VIEW: SELECT i QUERY REWRITE
+
+-PRIVILEGIJE ZA DIREKTORIJUME: READ i WRITE
+
+// Pravljenje ROLE je skup privilegija na jednom mestu:
+
+22. Komande za pravljenje ROLE i dodavanje privilegija u nju:
+
+//pravljenje
+CREATE ROLE new_dba; 
+
+//dodavanje
+GRANT CONNECT TO new_dba;
+GRANT SELECT ANY TABLE TO new_dba;
+GRANT select_catalog_role TO new_dba;
+
+23. Komanda za davanje ROLE ka korisniku:
+
+GRANT new_dba TO JOHNY;
+
+24. Komanda za dodelu sifre za ROLE:
+
+CREATE ROLE clerc IDENTIFIED BY sifra;
+
+

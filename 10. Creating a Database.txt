@@ -1,0 +1,125 @@
+Postupci za paljenje i gasenje baze 
+
+1. Komanda za gasenje baze 
+
+SHUTDOWN IMMEDIATE;
+
+2. Komanda za stavljanje baze  u mount mod
+
+STARTUP MOUNT
+
+3. Komanda za stavljanje baze u archivelog mod za cuvanje log fajlova
+
+ALTER DATABASE ARCHIVELOG
+
+4. Komanda za otvaranje baze 
+
+ALTER DATABASE OPEN;
+
+5. Komanda za pregled archive loga
+
+ARCHIVE LOG LIST
+
+6. Komanda za stavljanje baze u noarchivelog mod
+
+ALTER DATABASE NOARCHIVELOG;
+
+//Prilikom pokretanja baze sa STARTUP komand Oracle ce pretraziti inicijalizatorske 
+parametre koji se nalaze u lokaciji $ORACLE_HOM/dbs a to su fajlovi:
+
+ - spfile$ORACLE_SID.ora
+ - spfile.ora
+ - init$ORACLE_SID.ora
+
+//Komandom startup nomount mod - ne citaju se control files i datafiles nisu otvoreni.
+
+7. Komanda za statrovanje u nomount mod
+
+STARTUP NOMOUNT;
+
+//nakon toga se instanca startuje i potrebno je da se mountuje baza. To znaci da oracle otvara
+i cita control files i imena i lokacije datafiles i redo log files. Komanda kojom se stavlja u mount mod
+
+8. Komanda koja stavlja bazu u mount mod
+
+ALTER DATABASE MOUNT;
+
+//nakon toga moze se pristupiti otvaranju baze podataka da bi mogle da se izvrsavaju operacije baze podataka
+
+9. Komanda za otvaranje baze podataka 
+
+ALTER DATABASE OPEN;
+
+10. Komanda koja obuhvata sve ove korake nomount-mount-open, moze se postici jednom komandom STARTUP
+
+STARTUP;
+
+11. Komanda za slucaj da loadujemo podatke, exportujemo ili eksportujemo podatke a zalimo da baza bude otvorena za nas ali ne za druge korisnike koristi se komanda
+
+STARTUP RESTRICT;
+
+12. Komanda za uklanjanje zabrane pristupa bazi za druge korisnike
+
+ALTER SYSTEM DISABLE RESTRICTED SESSION;
+
+13. Komanda za promenu stanja preko komande
+
+ALTER SYSTEM ENABLE RESTRICTED SESSION;
+
+
+//Koraci za gasenje baze podataka - nekoliko nacina
+Prvi nacin: normalno gasenje: Oracle ce sacekati da se svi korisnici diskonektuju sa baze
+i onda ce se baza ugasiti. Normalni mod je Oraclov default mod za gasenje baze
+
+14. Komanda za normalno gasenje baze
+
+SHUTDOWN NORMAL;   //ili SHUTDOWN;
+
+Drugi nacin: Ako ne zelimo da cekamo da se korisnik diskonektuje koristi se opcija da se baza
+ugasi nakon sto korisnik zavrsi svoju transakciju i onda ce ugasiti bazu.
+
+15. Komanda za gasenje baze transakciono
+
+SHUTDOWN TRANSACTIONAL
+
+Treci nacin: Komanda SHUTDOWN IMMEDIATE nece cekati da se korisnik izloguje ili cekati da zavrsi bilo kakvu transakciju.
+Jednostavno ce vratiti -rollback sve aktivne transakcije, diskonektovati sve kroisnike i ugasiti  bazu.
+
+16. Komanda za hitno gasenje baze 
+
+SHUTDOWN IMMEDIATE;
+
+Cetvrti nacin: Komanda SHUTDOWN ABORT ce nasilno ugasiti bazu podataka. Trenutne transakcije koje se pokrecu nece biti omogucene da se zavrse
+i nece biti vracene - rollback. Korisnici ce se samo diskonektovati.
+
+17. Komanda za nasilno gasenje baze podataka
+
+SHUTDOWN ABORT;
+
+18. Komanda za suspendovanje baze koja moze da se koristi ako je potrbno hitno izvodjenje
+backupa tablespace ili slicno kao sto je splliting a mirror, suspendovanje se vrsi preko komande
+
+ALTER SYSTEM SUSPEND;
+ALTER SYSTEM RESUME;
+
+19. Komanda za brisanje baze podataka:
+
+connect sys/password as sysdba;
+//connecting to an idle istance
+STARTUP RESTRICT MOUNT;
+select name from v$database;
+DROP DATABASE;
+
+20. Komanda za pregled instance iz data dictionary view
+
+SELECT instance_name, status, shutdown_pending, active_state FROM v$instance;
+
+21. Komanda za pregled baze podataka iz data dictionary view
+
+SELECT name, log_mode, flashback_on FROM v$database;
+
+
+
+
+
+
