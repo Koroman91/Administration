@@ -1,0 +1,122 @@
+PL/SQL blokovi
+
+1. Komanda za pregled izlaza na Script Output:
+
+SET SERVEROUTPUT on;
+
+2. PL/SQL blok - stampa
+
+BEGIN
+DBMS_OUTPUT.PUT_LINE("Hello World");
+END;
+
+3. Obicno deklarisanje integera, smestanje rezultata, prikaz rezultata na izlaz:
+
+DECLARE 
+ book_count integer;
+BEGIN
+SELECT COUNT(*) INTO book_count FROM books;
+
+DBMS_OUTPUT.PUT_LINE ('Number of books ' || book_count);
+
+END;
+
+4. Nakon otkucanog bloka PL/SQL znak '/' sluzi za izvrsenje bloka PL/SQL
+
+5. Komanda za izvrsenje PL/SQL bloka:
+
+EXECUTE dbms_output.put_line('Stefan');
+
+6. PL/SQL blok sa dve promenljive - dodela vrednosti i stampa:
+
+declare
+ime VARCHAR2(20);
+godine NUMBER(3);
+begin
+ime := 'Stefan';
+godine := 27;
+DBMS_OUTPUT.PUT_LINE('Ime : ' || ime);
+DBMS_OUTPUT.PUT_LINE('Godine : ' || godine);
+end;
+
+7. PL/SQL blok dve promenljive i dodavanje podataka iz tabele koja se vec nalazi u bazi:
+
+declare 
+fname varchar2(20);
+sal number(6);
+begin
+select first_name, salary into fname, sal from Employees
+where employee_id = 101;
+DBMS_OUTPUT.PUT_LINE('Ime : ' || fname);
+DBMS_OUTPUT.PUT_LINE('Plata : ' || sal);
+end;
+
+8. PL/SQL blok sa dve promenljive kojima je dodeljen postojeci tip iz tabele:
+
+declare 
+fname Employees.first_name%TYPE;
+sal Employees.salary%TYPE;
+begin
+select first_name, salary into fname, sal from Employees
+where employee_id = 101;
+DBMS_OUTPUT.PUT_LINE('Ime : ' || fname);
+DBMS_OUTPUT.PUT_LINE('Plata : ' || sal);
+end;
+
+9. PL/SQL blok sa koriscenjem %ROWTYPE smestanjem celog reda:
+
+declare 
+record Employees%ROWTYPE;
+begin
+select * into record from Employees
+where employee_id = 101;
+DBMS_OUTPUT.PUT_LINE(record.first_name || ' | ' || record.last_name || ' | ' || record.salary);
+end;
+
+10. a) PL/SQL blok primer sa if uslovom 
+
+declare
+empid number(4);
+sal number(5);
+begin
+select employee_id, salary into empid, sal from employees where employee_id = 115;
+dbms_output.put_line(empid || ' | ' || sal);
+if empid = 115 then
+   sal := sal + 1000;
+   end if;
+dbms_output.put_line(empid || ' | ' || sal);
+end;
+
+b)  sa else
+
+declare
+empid number(4);
+sal number(5);
+begin
+select employee_id, salary into empid, sal from employees where employee_id = 115;
+dbms_output.put_line(empid || ' | ' || sal);
+if empid = 115 then
+   sal := sal + 1000;
+else
+   sal := sal + 500;
+   end if;
+dbms_output.put_line(empid || ' | ' || sal);
+end;
+
+c) sa else if
+
+declare
+empid number(4);
+sal number(5);
+begin
+select employee_id, salary into empid, sal from employees where employee_id = 115;
+dbms_output.put_line(empid || ' | ' || sal);
+if empid = 115 then
+   sal := sal + 1000;
+   elseif empid = 114 then
+   sal := sal + 400;
+   else
+   sal := sal + 300;
+   end if;
+dbms_output.put_line(empid || ' | ' || sal);
+end;
