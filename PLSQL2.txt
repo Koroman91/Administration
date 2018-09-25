@@ -144,3 +144,13 @@ for i in 1..10 loop
    dbms_output.put_line('Broj: ' || i); 
    end loop;
 end;
+
+13. PL/SQL blok - update statement + Implicit Cursor SQL%RowCount
+
+declare 
+cnt number(4);
+begin 
+  update Employee set salary = salary + 500 where employee_id < 115;
+  cnt :=SQL%RowCount;
+  dbms_output.put_line(cnt || ' rows updated');
+end;
