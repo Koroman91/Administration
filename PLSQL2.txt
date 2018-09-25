@@ -120,3 +120,27 @@ if empid = 115 then
    end if;
 dbms_output.put_line(empid || ' | ' || sal);
 end;
+
+
+11. PL/SQL blok - while loop
+
+
+declare 
+emp number(4);
+begin
+emp := 1;
+while emp < 110 loop 
+   dbms_output.put_line('Broj: ' || emp);
+   emp := emp+1;
+end loop;
+end;
+
+12. PL/SQL blok - for loop
+
+declare 
+i number(4);
+begin
+for i in 1..10 loop
+   dbms_output.put_line('Broj: ' || i); 
+   end loop;
+end;
